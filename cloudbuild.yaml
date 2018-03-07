@@ -1,0 +1,10 @@
+steps:
+  # Build the helloworld container image.
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}'
+
+images:
+  - 'gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}'
