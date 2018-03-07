@@ -52,7 +52,7 @@ steps:
       - name: 'kube'
         path: /kube
 
-    # Clone https://github.com/crowdynews/gitops-hello-world-infra-staging-gcb
+  # Update Infra config repo to trigger a deploy to staging
   - name: 'gcr.io/hightowerlabs/hub'
     env:
       - 'HUB_CONFIG=/config/hub'
@@ -62,13 +62,44 @@ steps:
       - '-c'
       - |
         ACTIVE_ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+
         hub config --global credential.https://github.com.helper /usr/local/bin/hub-credential-helper
         hub config --global hub.protocol https
         hub config --global user.email "$${ACTIVE_ACCOUNT}"
         hub config --global user.name "Google Container Builder"
+
         hub clone "https://github.com/crowdynews/gitops-hello-world-infra-staging-gcb.git"
+
         cd gitops-hello-world-infra-staging-gcb
-        cat README.md
+
+        cat <<EOF > patch.yaml
+        spec:
+          template:
+            spec:
+              containers:
+                - name: gitops-hello-world-gcb
+                  image: gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}
+        EOF
+
+        kubectl patch --local -o yaml \
+          -f kubernetes/deployment.yaml \
+          -p "$(cat patch.yaml)" \
+          > deployment.yaml
+
+        mv deployment.yaml kubernetes/deployment.yaml
+
+        hub add kubernetes/deployment.yaml
+
+        hub commit -F- <<EOF
+        Update hello world REST API
+
+        This commit updates the deployment container image to:
+            gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}
+        Build ID:
+            ${BUILD_ID}
+        EOF
+
+        hub push origin master
     volumes:
       - name: 'config'
         path: /config
