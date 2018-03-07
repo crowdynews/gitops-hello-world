@@ -52,5 +52,28 @@ steps:
       - name: 'kube'
         path: /kube
 
+    # Clone https://github.com/crowdynews/gitops-hello-world-infra-staging-gcb
+  - name: 'gcr.io/hightowerlabs/hub'
+    env:
+      - 'HUB_CONFIG=/config/hub'
+      - 'KUBECONFIG=/kube/config'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        ACTIVE_ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+        hub config --global credential.https://github.com.helper /usr/local/bin/hub-credential-helper
+        hub config --global hub.protocol https
+        hub config --global user.email "$${ACTIVE_ACCOUNT}"
+        hub config --global user.name "Google Container Builder"
+        hub clone "https://github.com/crowdynews/gitops-hello-world-infra-staging-gcb.git"
+        cd gitops-hello-world-infra-staging-gcb
+        cat README.md
+    volumes:
+      - name: 'config'
+        path: /config
+      - name: 'kube'
+        path: /kube
+
 images:
   - 'gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}'
