@@ -8,7 +8,8 @@
     "precommit": "lint-staged",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --list-different 'src/**/*.js'",
-    "lint": "eslint --ext .js src"
+    "lint": "eslint --ext .js src",
+    "start": "nodemon src/app.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,10 @@
     "eslint-plugin-import": "^2.9.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.0.0",
+    "nodemon": "^1.17.1",
     "prettier": "^1.11.1"
+  },
+  "dependencies": {
+    "express": "^4.16.2"
   }
 }

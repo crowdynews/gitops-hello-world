@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+LICENSE
+README.md
+cloudbuild.yaml
+.editorconfig
+.git
+.gitignore
+.gitattributes
+.*rc*
