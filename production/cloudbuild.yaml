@@ -119,3 +119,6 @@ steps:
         path: /config
       - name: 'kube'
         path: /kube
+
+images:
+  - 'gcr.io/${PROJECT_ID}/hello-world-gcb:${TAG_NAME}'
