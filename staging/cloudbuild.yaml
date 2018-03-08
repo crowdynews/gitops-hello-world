@@ -62,6 +62,7 @@ steps:
       - '-c'
       - |
         ACTIVE_ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+        CONTAINER_IMAGE="gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}"
 
         hub config --global credential.https://github.com.helper /usr/local/bin/hub-credential-helper
         hub config --global hub.protocol https
@@ -78,7 +79,7 @@ steps:
             spec:
               containers:
                 - name: gitops-hello-world-gcb
-                  image: gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}
+                  image: $${CONTAINER_IMAGE}
         EOF
 
         kubectl patch --local -o yaml \
@@ -94,7 +95,7 @@ steps:
         Update hello world REST API
 
         This commit updates the deployment container image to:
-            gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}
+            $${CONTAINER_IMAGE}
 
         Build ID:
             ${BUILD_ID}
