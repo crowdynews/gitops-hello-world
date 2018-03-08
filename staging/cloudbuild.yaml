@@ -79,7 +79,7 @@ steps:
             spec:
               containers:
                 - name: gitops-hello-world-gcb
-                  image: ${CONTAINER_IMAGE}
+                  image: $${CONTAINER_IMAGE}
         EOF
 
         kubectl patch --local -o yaml \
@@ -95,7 +95,7 @@ steps:
         Update hello world REST API
 
         This commit updates the deployment container image to:
-            ${CONTAINER_IMAGE}
+            $${CONTAINER_IMAGE}
 
         Build ID:
             ${BUILD_ID}
