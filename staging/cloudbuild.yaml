@@ -62,7 +62,7 @@ steps:
       - '-c'
       - |
         ACTIVE_ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
-        CONTAINER_IMAGE=gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}
+        CONTAINER_IMAGE="gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}"
 
         hub config --global credential.https://github.com.helper /usr/local/bin/hub-credential-helper
         hub config --global hub.protocol https
