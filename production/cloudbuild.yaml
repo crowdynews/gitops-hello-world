@@ -6,12 +6,12 @@
 # _CLOUDSDK_CONTAINER_CLUSTER
 
 steps:
-  # Build container image.
+  # Build container image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}'
+      - 'gcr.io/${PROJECT_ID}/hello-world-gcb:${TAG_NAME}'
       - '.'
 
   # Retrieve and decrypt the GitHub Hub configuration, contains GitHub username + token
@@ -31,7 +31,7 @@ steps:
       - name: 'config'
         path: /config
 
-  # Generate a kube config file for the given GKE cluster.
+  # Generate a kube config file for the given GKE cluster
   - name: 'gcr.io/cloud-builders/gcloud'
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
@@ -52,7 +52,7 @@ steps:
       - name: 'kube'
         path: /kube
 
-  # Update Infra config repo to trigger a deploy to staging
+  # Create a pull request on Infra config production
   - name: 'gcr.io/hightowerlabs/hub'
     env:
       - 'HUB_CONFIG=/config/hub'
@@ -62,15 +62,16 @@ steps:
       - '-c'
       - |
         ACTIVE_ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+        CONTAINER_IMAGE="gcr.io/$${PROJECT_ID}/hello-world-gcb:$${SHORT_SHA}"
 
         hub config --global credential.https://github.com.helper /usr/local/bin/hub-credential-helper
         hub config --global hub.protocol https
         hub config --global user.email "$${ACTIVE_ACCOUNT}"
         hub config --global user.name "Google Container Builder"
 
-        hub clone "https://github.com/crowdynews/gitops-hello-world-infra-staging-gcb.git"
+        hub clone "https://github.com/crowdynews/gitops-hello-world-infra-production-gcb.git"
 
-        cd gitops-hello-world-infra-staging-gcb
+        cd gitops-hello-world-infra-production-gcb
 
         cat <<EOF > patch.yaml
         spec:
@@ -78,7 +79,7 @@ steps:
             spec:
               containers:
                 - name: gitops-hello-world-gcb
-                  image: gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}
+                  image: $${CONTAINER_IMAGE}
         EOF
 
         kubectl patch --local -o yaml \
@@ -88,23 +89,33 @@ steps:
 
         mv deployment.yaml kubernetes/deployment.yaml
 
-        hub add kubernetes/deployment.yaml
+        git checkout -b update-deployment-${BUILD_ID}
 
+        hub add kubernetes/deployment.yaml
+ 
         hub commit -F- <<EOF
         Update hello world REST API
 
         This commit updates the deployment container image to:
-            gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}
+            $${CONTAINER_IMAGE}
+
         Build ID:
-            ${BUILD_ID}
+            $${BUILD_ID}
         EOF
 
-        hub push origin master
+        hub push origin update-deployment-${BUILD_ID}
+
+        hub pull-request -F- <<EOF
+        Update hello world REST API
+
+        This commit updates the deployment container image to:
+            $${CONTAINER_IMAGE}
+
+        Build ID:
+            $${BUILD_ID}
+        EOF
     volumes:
       - name: 'config'
         path: /config
       - name: 'kube'
         path: /kube
-
-images:
-  - 'gcr.io/${PROJECT_ID}/hello-world-gcb:${SHORT_SHA}'
