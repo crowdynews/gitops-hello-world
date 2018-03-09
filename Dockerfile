@@ -1,4 +1,4 @@
-FROM node:9.7-alpine AS build
+FROM node:9.8-alpine AS build
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY src ./src
 RUN chown -R node:node .
 USER node
 
-FROM node:9.7-alpine
+FROM node:9.8-alpine
 
 COPY --from=build /app ./
 
