@@ -6,6 +6,15 @@ deploy to a Kubernetes cluster.
 
 This is a reproduced workflow as presented during the [KubeCon Opening Keynote by Kelsey Hightower](https://www.youtube.com/watch?v=07jq-5VbBVQ), using [this repo](https://github.com/kelseyhightower/helloworld) as a blueprint.
 
+## Workflow
+
+![workflow](./workflow.png)
+
+## Infrastructure Config
+
+* [Staging](https://github.com/crowdynews/gitops-hello-world-infra-staging-gcb)
+* [Production](https://github.com/crowdynews/gitops-hello-world-infra-production-gcb)
+
 ## Running locally
 
 ```
