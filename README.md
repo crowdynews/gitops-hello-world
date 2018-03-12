@@ -10,6 +10,16 @@ This is a reproduced workflow as presented during the [KubeCon Opening Keynote b
 
 ![workflow](./workflow.png)
 
+### Remarks and Questions
+
+* CI system has too much responsibility; it also handles deployment and release management.
+* Observability is crucial to know if a deploy can move to the next stage; we need dashboards.
+* There're no cleanup policies for staging; after a branch has been merged to master or removed.
+* There's no alerting when builds fail or deploys succeed.
+* There's no way to be alerted when the cluster state diverges from the desired state stored in Git.
+* Only way to rollback a change now is by reverting a commit in an infra repo.
+* This workflow doesn't include Helm charts; how do they fit in?
+
 ## Infrastructure Config
 
 * [Staging](https://github.com/crowdynews/gitops-hello-world-infra-staging-gcb)
