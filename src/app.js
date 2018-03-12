@@ -8,7 +8,7 @@ const app = express();
 
 app.get('/', function helloWorld(req, res) {
   res.jsonp({
-    text: 'Hello World GitOps!!!!'
+    text: 'Hello World GitOps!!!! [v2]'
   });
 });
 
